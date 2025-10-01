@@ -103,18 +103,19 @@ int main(void)
   while (1)
   {
     state = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2);
-    if (state == GPIO_PIN_SET) {
+    if (state == GPIO_PIN_SET && last_state==GPIO_PIN_RESET) {
         key_time = HAL_GetTick();
-			 flag += 1;
+				last_state=GPIO_PIN_SET;
     }
-    if ((HAL_GetTick() - key_time) > 15) {
-        if (state == GPIO_PIN_SET && last_state == GPIO_PIN_RESET) {
-            flag = (flag + 1);
+    if ((HAL_GetTick() - key_time) >15 && last_state==GPIO_PIN_SET) {
+            flag = !flag;
+					last_state=GPIO_PIN_RESET;
         }
-        last_state = state;
-    }
+    
+		
+	
     if ((HAL_GetTick() - led_time) > interval) {
-        if (flag % 2 == 1) {
+        if (flag) {
             HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_11);
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_14, GPIO_PIN_SET);
         }
@@ -124,7 +125,6 @@ int main(void)
         }
         led_time = HAL_GetTick();
     }
-		HAL_Delay(50);
   }
 	
 
