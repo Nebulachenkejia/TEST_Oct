@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -43,12 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t flag = 0;
-uint32_t key_time = 0;
-uint32_t interval = 300; 
-uint8_t last_state = GPIO_PIN_RESET;
-uint32_t led_time = 0;
-uint8_t state = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,10 +87,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
     HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOF,GPIO_PIN_14,GPIO_PIN_SET);
-
+	HAL_TIM_Base_Start(&htim1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,29 +99,14 @@ int main(void)
 
   while (1)
   {
-    state = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2);
-    if (state == GPIO_PIN_SET) {
-        key_time = HAL_GetTick();
-			 flag += 1;
-    }
-    if ((HAL_GetTick() - key_time) > 15) {
-        if (state == GPIO_PIN_SET && last_state == GPIO_PIN_RESET) {
-            flag = (flag + 1);
-        }
-        last_state = state;
-    }
-    if ((HAL_GetTick() - led_time) > interval) {
-        if (flag % 2 == 1) {
-            HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_11);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_14, GPIO_PIN_SET);
-        }
-        else {
-            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
-            HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
-        }
-        led_time = HAL_GetTick();
-    }
-		HAL_Delay(50);
+   if(__HAL_TIM_GetCounter(&htim1) > __HAL_TIM_GET_AUTORELOAD(&htim1)/2){
+		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,GPIO_PIN_SET);
+		 HAL_GPIO_WritePin(GPIOF,GPIO_PIN_14,GPIO_PIN_RESET);
+	 }
+	 else{
+		 HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,GPIO_PIN_RESET);
+		 HAL_GPIO_WritePin(GPIOF,GPIO_PIN_14,GPIO_PIN_SET);
+	 }
   }
 	
 
@@ -152,13 +134,12 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 180;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 15;
+  RCC_OscInitStruct.PLL.PLLN = 216;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
