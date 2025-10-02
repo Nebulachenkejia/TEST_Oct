@@ -45,7 +45,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t rx_msg[4];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,10 +90,10 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_UART7_Init();
-  MX_UART8_Init();
   /* USER CODE BEGIN 2 */
-	uint8_t tx_msg[] = "RM";
-	
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+	HAL_UART_Receive_IT(&huart7, rx_msg,1);
+  uint8_t tx_msg[] = "RM";
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,8 +101,8 @@ int main(void)
 
   while (1)
   {
-		HAL_UART_Transmit(&huart7, tx_msg, 2 ,1000);
-		HAL_Delay(500);
+    HAL_UART_Transmit(&huart7, tx_msg,2,1000);
+    HAL_Delay(1000);
   }
     /* USER CODE END WHILE */
 
@@ -132,8 +132,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 15;
-  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLM = 6;
+  RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
