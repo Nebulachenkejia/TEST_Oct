@@ -91,8 +91,9 @@ int main(void)
   MX_TIM1_Init();
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-		HAL_GPIO_WritePin(GPIOF,GPIO_PIN_14,GPIO_PIN_SET);
+	HAL_TIM_Base_Start_IT(&htim1);
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
