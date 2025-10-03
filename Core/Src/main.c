@@ -44,7 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t tx_data[8] = {0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+uint8_t tx_data[8] = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 uint8_t rx_data[8];
 uint32_t can_tx_mail_box_;
 CAN_RxHeaderTypeDef rx_header;
