@@ -5,11 +5,14 @@
 #ifndef TIMER_M3508_MOTOR_H
 #define TIMER_M3508_MOTOR_H
 #include "main.h"
-class M3508_Motor{
+#include "pid"
+
+class M3508_Motor
+{
 private:
     const float ratio_;
     float angle_ = 0.f;
-    float delta_angle_ =0.f;
+    float delta_angle_ = 0.f;
     float ecd_angle_ = 0.f;
     float last_ecd_angle_ = 0.f;
     float delta_ecd_angle_ = 0.f;
@@ -22,11 +25,12 @@ private:
     uint16_t given_current_ = 0;
 
 public:
-    explicit M3508_Motor(const float ratio) : ratio_(ratio){};
+    explicit M3508_Motor(const float ratio) : ratio_(ratio)
+    {
+    };
 
     void canRxMsgCallback(const uint8_t rx_data[8]);
     float linearMapping(int in, int in_min, int in_max, float out_min, float out_max);
-
 };
 
 #endif //TIMER_M3508_MOTOR_H
