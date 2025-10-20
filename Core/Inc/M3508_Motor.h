@@ -6,12 +6,13 @@
 #define TIMER_M3508_MOTOR_H
 #include "main.h"
 #include "pid.h"
+#include <cmath>
 
 class M3508_Motor
 {
 private:
     PID spid_, ppid_;
-    float target_angle_ = 0.0f, fdb_angle_ = 0.0f;
+    float fdb_angle_ = 0.0f;
     float target_speed_ = 0.0f, fdb_speed_ = 0.0f, feedforward_speed_ = 0.0f;
     float feedforward_intensity_ = 0.0f, output_intensity_ = 0.0f;
 
@@ -35,18 +36,17 @@ private:
     int16_t speed_raw_ = 0;
     int16_t current_read_ = 0;
 
-    //控制量
-    int16_t given_current_ = 0;
-
 public:
-    M3508_Motor(const float ratio);
+    M3508_Motor(const float ratio, float target_angle);
     void canRxMsgCallback(const uint8_t rx_data[8]); //获取输入
-    float linearMapping(int in, int in_min, int in_max, float out_min, float out_max);
-
+    float linearMapping(float in, float in_min, float in_max, float out_min, float out_max);
+    int16_t given_current_ = 0;
     void handle();
+    float target_angle_ = 0.0f;
     void SetPosition(float target_position, float feedforward_speed, float feedforward_intensity);
     void SetSpeed(float target_speed, float feedforward_intensity);
     void SetIntensity(float intensity);
+    float FeedforwardIntensityCalc(float current_angle);
 };
 
 #endif //TIMER_M3508_MOTOR_H

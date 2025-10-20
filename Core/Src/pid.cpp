@@ -49,7 +49,7 @@ float PID::calc(float ref, float fdb)
     last_dout_ = dout_;
     last_err_ = err_;
     output_ = pout_ + iout_ + dout_;
-    if (output_ > out_max_) output_ = out_max_;
-    else if (output_ < -out_max_) output_ = -out_max_;
+    //if (output_ > out_max_) output_ = out_max_;
+    //else if (output_ < -out_max_) output_ = -out_max_;
     return output_;
 }

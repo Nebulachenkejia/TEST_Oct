@@ -1,7 +1,10 @@
 #include "M3508_Motor.h"
+extern uint8_t stop_flag;
 
-M3508_Motor::M3508_Motor(const float ratio) : ratio_(ratio), spid_(30.0f, 0.5f, 0.0f, 10.0f, 2000.0f),
-                                              ppid_(30.0f, 0.5f, 0.0f, 10.0f, 2000.0f), control_method_(TORQUE)
+M3508_Motor::M3508_Motor(const float ratio, float target_angle) : ratio_(ratio),
+                                                                  spid_(30.0f, 0.0f, 0.0f, 10.0f, 0.5f),
+                                                                  ppid_(30.0f, 0.5f, 0.0f, 10.0f, 0.5f),
+                                                                  control_method_(TORQUE), target_angle_(target_angle)
 {
 };
 
@@ -22,9 +25,11 @@ void M3508_Motor::canRxMsgCallback(const uint8_t rx_data[8])
     delta_angle_ = delta_ecd_angle_ / ratio_;
     last_ecd_angle_ = ecd_angle_;
     fdb_angle_ += delta_angle_;
+    while (fdb_angle_ > 360) fdb_angle_ -= fdb_angle_;
+    while (fdb_angle_ < 0) fdb_angle_ += 360;
 }
 
-float M3508_Motor::linearMapping(int in, int in_min, int in_max, float out_min, float out_max)
+float M3508_Motor::linearMapping(float in, float in_min, float in_max, float out_min, float out_max)
 {
     return (in - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -55,6 +60,11 @@ void M3508_Motor::SetIntensity(float intensity)
 
 void M3508_Motor::handle()
 {
+    if (stop_flag == 1)
+    {
+        given_current_ = 0.0f;
+        return;
+    }
     switch (control_method_)
     {
     case TORQUE:
@@ -68,8 +78,14 @@ void M3508_Motor::handle()
         output_intensity_ = spid_.calc(target_speed_, fdb_speed_) + feedforward_intensity_;
         break;
     }
-    if (output_intensity_ > spid_.out_max_) output_intensity_ = spid_.out_max_;
-    else if (output_intensity_ < -spid_.out_max_) output_intensity_ = -spid_.out_max_;
-    given_current_ = static_cast<int16_t>(linearMapping(output_intensity_, -spid_.out_max_, spid_.out_max_, -16384,
+    if (output_intensity_ > 0.006) output_intensity_ = 0.006;
+    else if (output_intensity_ < -0.006) output_intensity_ = -0.006;
+    given_current_ = static_cast<int16_t>(linearMapping(output_intensity_, -1, 1, -16384,
                                                         16384));
+}
+
+float M3508_Motor::FeedforwardIntensityCalc(float current_angle)
+{
+    const float C = 0.5 * 0.05524;
+    return C * sin(current_angle * 3.1415926f / 180.0f);
 }
