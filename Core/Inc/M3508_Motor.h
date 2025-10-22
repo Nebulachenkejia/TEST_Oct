@@ -47,6 +47,7 @@ public:
     void SetSpeed(float target_speed, float feedforward_intensity);
     void SetIntensity(float intensity);
     float FeedforwardIntensityCalc(float current_angle);
+    float F = -0.01f;
 };
 
 #endif //TIMER_M3508_MOTOR_H

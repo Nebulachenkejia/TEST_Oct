@@ -41,15 +41,15 @@ float PID::calc(float ref, float fdb)
     err_ = ref - fdb;
     pout_ = kp_ * err_;
     err_sum_ += err_;
-    iout_ = ki_ * err_sum_ / freq_;
+    iout_ = ki_ * err_sum_;
     if (iout_ > i_max_) iout_ = i_max_;
     else if (iout_ < -i_max_) iout_ = -i_max_;
-    dout_ = kd_ * (err_ - last_err_) * freq_;
+    dout_ = kd_ * (err_ - last_err_);
     dout_ = d_filter_k_ * dout_ + (1 - d_filter_k_) * last_dout_;
     last_dout_ = dout_;
     last_err_ = err_;
     output_ = pout_ + iout_ + dout_;
-    //if (output_ > out_max_) output_ = out_max_;
-    //else if (output_ < -out_max_) output_ = -out_max_;
+    if (output_ > out_max_) output_ = out_max_;
+    else if (output_ < -out_max_) output_ = -out_max_;
     return output_;
 }

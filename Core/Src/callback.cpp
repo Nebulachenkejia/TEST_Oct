@@ -9,15 +9,19 @@ extern CAN_RxHeaderTypeDef rx_header;
 extern CAN_TxHeaderTypeDef tx_header;
 extern uint32_t can_tx_mail_box_;
 extern uint8_t rx_data[8];
-M3508_Motor Motor(19.2, 60);
+extern uint8_t stop_flag;
+M3508_Motor Motor(19.2, 30);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
     if (htim->Instance == htim6.Instance)
     {
-        Motor.SetSpeed(200, Motor.FeedforwardIntensityCalc(Motor.target_angle_));
+        if (stop_flag)
+        {
+            Motor.SetPosition(Motor.target_angle_, 0.0f, 0.0f);
+        }
         Motor.handle();
-        tx_data[4] = Motor.given_current_ >> 4 & 0xFF;
+        tx_data[4] = Motor.given_current_ >> 8;
         tx_data[5] = Motor.given_current_ & 0xFF;
         HAL_CAN_AddTxMessage(&hcan1, &tx_header, tx_data, &can_tx_mail_box_);
     }

@@ -13,7 +13,7 @@ public:
     PID(void) : PID(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
     {
     };
-    PID(float kp, float ki, float kd, float i_max, float out_max, float d_filter_k = 1, uint64_t freq = 1000);
+    PID(float kp, float ki, float kd, float i_max, float out_max, float d_filter_k = 0.1, uint64_t freq = 1000);
 
     void reset(void); //重置积分项和误差项
     float calc(float ref, float fdb);

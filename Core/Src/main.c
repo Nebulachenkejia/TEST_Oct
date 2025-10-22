@@ -46,6 +46,7 @@
 /* USER CODE BEGIN PV */
 //按键
 uint8_t stop_flag = 1;
+uint8_t angle_flag = 0;
 uint8_t key_state = 0;
 uint32_t key_press_time = 0;
 
