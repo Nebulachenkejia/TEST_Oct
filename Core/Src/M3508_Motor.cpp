@@ -3,8 +3,8 @@ extern uint8_t stop_flag;
 extern uint8_t angle_flag;
 
 M3508_Motor::M3508_Motor(const float ratio, float target_angle) : ratio_(ratio),
-                                                                  spid_(0.008f, 0.0f, 0.0000001f, 10.0f, 3.0f),
-                                                                  ppid_(160.0f, 0.1f, 0.1f, 10.0f, 469 * 6.0f),
+                                                                  spid_(0.007f, 0.0f, 0.0f, 10.0f, 3.0f),
+                                                                  ppid_(160.0f, 0.1f, 0.000000001f, 10.0f, 469 * 6.0f),
                                                                   control_method_(TORQUE), target_angle_(target_angle)
 {
 };
